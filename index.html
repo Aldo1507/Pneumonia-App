@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pneumonia Detection</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>Pneumonia Detection</h1>
+      <p>Upload a chest X-ray image to get an AI-powered diagnosis.</p>
+
+      <!-- Upload box with image preview -->
+      <label class="upload-box" id="uploadBox">
+        <input type="file" id="imageInput" accept="image/*" />
+        <span id="uploadText">Click to upload X-ray image</span>
+        <img
+          id="preview"
+          src=""
+          alt="Preview"
+          style="
+            display: none;
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+          "
+        />
+      </label>
+
+      <button id="predictBtn">Analyze Image</button>
+
+      <div id="result" class="result" style="display: none"></div>
+    </div>
+
+    <script src="pneumoniaApi.js"></script>
+  </body>
+</html>
