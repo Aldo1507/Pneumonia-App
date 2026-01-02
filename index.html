@@ -2,36 +2,32 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pneumonia Detection</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="card">
-      <h1>Pneumonia Detection</h1>
-      <p>Upload a chest X-ray image to get an AI-powered diagnosis.</p>
+    <div class="container">
+      <h1>🫁 Pneumonia Detection</h1>
+      <p class="subtitle">Upload a chest X-ray to detect pneumonia using AI</p>
 
-      <!-- Upload box with image preview -->
-      <label class="upload-box" id="uploadBox">
+      <div
+        class="upload-area"
+        onclick="document.getElementById('imageInput').click()"
+      >
         <input type="file" id="imageInput" accept="image/*" />
-        <span id="uploadText">Click to upload X-ray image</span>
-        <img
-          id="preview"
-          src=""
-          alt="Preview"
-          style="
-            display: none;
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 10px;
-          "
-        />
-      </label>
+        <img id="preview" alt="Preview" />
+        <div id="uploadText">
+          📁 Click to upload X-ray image<br />
+          <small style="color: #999">or drag and drop</small>
+        </div>
+      </div>
 
       <button id="predictBtn">Analyze Image</button>
 
-      <div id="result" class="result" style="display: none"></div>
+      <div id="result" class="result"></div>
     </div>
 
-    <script src="pneumoniaApi.js"></script>
+    <script type="module" src="pneumoniaApi.js"></script>
   </body>
 </html>

@@ -1,14 +1,21 @@
+import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js";
+
 const input = document.getElementById("imageInput");
 const preview = document.getElementById("preview");
 const uploadText = document.getElementById("uploadText");
 const button = document.getElementById("predictBtn");
 const result = document.getElementById("result");
 
-input.addEventListener("change", () => {
+let selectedFile = null;
+
+// Show image preview
+input.addEventListener("change", function () {
   const file = input.files[0];
+  selectedFile = file;
+
   if (file) {
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = function (e) {
       preview.src = e.target.result;
       preview.style.display = "block";
       uploadText.style.display = "none";
@@ -17,12 +24,13 @@ input.addEventListener("change", () => {
   } else {
     preview.style.display = "none";
     uploadText.style.display = "inline";
+    selectedFile = null;
   }
 });
 
-button.onclick = async () => {
-  const file = input.files[0];
-  if (!file) {
+// Handle Analyze Image button
+button.addEventListener("click", async function () {
+  if (!selectedFile) {
     alert("Please upload an image");
     return;
   }
@@ -32,39 +40,45 @@ button.onclick = async () => {
   result.style.display = "none";
 
   try {
-    const data = await predictPneumonia(file);
+    // Try connecting with the direct HF Space URL
+    let app;
+    try {
+      app = await Client.connect("aldodauti15/Pneumonia_App");
+    } catch (e) {
+      console.log("Trying alternative connection method...");
+      // Try with the direct .hf.space URL
+      app = await Client.connect("https://aldodauti15-pneumonia-app.hf.space");
+    }
 
+    // Call the prediction endpoint with the file
+    const prediction = await app.predict("/predict_wrapper", [selectedFile]);
+
+    console.log("Prediction result:", prediction);
+
+    // Extract prediction and probability
+    const predictionLabel = prediction.data[0];
+    const probability = prediction.data[1];
+
+    // Display result
     result.style.display = "block";
     result.className =
-      "result " + (data.prediction === "NORMAL" ? "good" : "bad");
-
-    result.innerHTML = `
-            <strong>${data.prediction}</strong><br/>
-            Probability: ${(data.probability * 100).toFixed(2)}%
-          `;
+      "result " + (predictionLabel === "NORMAL" ? "good" : "bad");
+    result.innerHTML =
+      "<strong>" +
+      predictionLabel +
+      "</strong>Probability: " +
+      probability.toFixed(2) +
+      "%";
   } catch (err) {
+    console.error("Full error:", err);
     result.style.display = "block";
     result.className = "result bad";
-    result.textContent = err.message;
+    result.innerHTML =
+      "Error: " +
+      err.message +
+      "<br><small>Make sure your Space is running and public</small>";
   }
 
   button.disabled = false;
   button.textContent = "Analyze Image";
-};
-
-export async function predictPneumonia(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch("http://127.0.0.1:7860/predict", {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Server error: ${text}`);
-  }
-
-  return response.json();
-}
+});
